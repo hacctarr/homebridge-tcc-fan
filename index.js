@@ -419,6 +419,47 @@ tccAccessory.prototype = {
         callback(null, Number(temperatureUnits));
     },
 
+    setTargetFanState: function(value, callback) {
+        var that = this;
+        if (!updating) {
+            updating = true;
+
+            that.log("Setting fan switch for", this.name, "to", value);
+            // TODO:
+            // verify that the task did succeed
+
+            tcc.login(this.username, this.password).then(function(session) {
+                session.setFanSwitch(that.deviceID, tcc.toTCCFanSystem(value)).then(function(taskId) {
+                    that.log("Successfully changed system!");
+                    that.log(taskId);
+                    // Update all information
+                    // TODO: call periodicUpdate to refresh all data elements
+                    updateValues(that);
+                    callback(null, Number(1));
+                });
+            }).fail(function(err) {
+                that.log('tcc Failed:', err);
+                callback(null, Number(0));
+            });
+            callback(null, Number(0));
+            updating = false
+        }
+    },
+    
+    getTargetFanState: function(callback) {
+        var that = this;
+
+        // Homekit allowed values
+//         Characteristic.TargetFanState.MANUAL = 0;
+//         Characteristic.TargetFanState.AUTO = 1;
+
+        var TargetFanState = tcc.toHomeBridgeFanSystem(this.device.latestData.fanData.fanMode);
+
+        this.log("getTargetFanState is ", TargetFanState,this.name);
+
+        callback(null, Number(TargetFanState));
+    },
+
     getCoolingThresholdTemperature: function(callback) {
         var that = this;
 
@@ -614,6 +655,14 @@ tccAccessory.prototype = {
         this.thermostatService
             .getCharacteristic(Characteristic.Name)
             .on('get', this.getName.bind(this));
+
+        // this.addOptionalCharacteristic(Characteristic.TargetFanState);
+        if (this.device.latestData.hasFan && this.device.latestData.fanData && this.device.latestData.fanData.fanModeOnAllowed) {
+            this.thermostatService
+                .getCharacteristic(Characteristic.TargetFanState)
+                .on('get', this.getTargetFanState(this))
+                .on('set', this.setTargetFanState(this));
+        }
 
         return [informationService, this.thermostatService];
 
