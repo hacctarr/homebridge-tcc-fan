@@ -117,6 +117,10 @@ function updateStatus(service, data) {
         service.getCharacteristic(Characteristic.HeatingThresholdTemperature)
             .getValue();
     }
+    if (this.device.latestData.hasFan && this.device.latestData.fanData && this.device.latestData.fanData.fanModeOnAllowed) {
+        service.getCharacteristic(Characteristic.TargetFanState).getValue();
+    }
+
 
 }
 
