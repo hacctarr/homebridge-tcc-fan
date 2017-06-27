@@ -1,7 +1,7 @@
 {
-  "name": "homebridge-tcc",
+  "name": "homebridge-tcc-fan",
   "version": "0.0.22",
-  "description": "Honeywell Total Connect Comfort support for Homebridge: https://github.com/nfarina/homebridge",
+  "description": "Honeywell Total Connect Comfort Fan support for Homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
     "homebridge-plugin",
@@ -10,10 +10,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NorthernMan54/homebridge-tcc.git"
+    "url": "git+https://github.com/elbirt/homebridge-tcc-fan.git"
   },
   "bugs": {
-    "url": "https://github.com/NorthernMan54/homebridge-tcc/issues"
+    "url": "https://github.com/elbirt/homebridge-tcc-fan/issues"
   },
   "engines": {
     "node": ">=0.12.0",
