@@ -1,9 +1,11 @@
-# homebridge-tcc
+# homebridge-tcc-fan
 
-[![NPM Downloads](https://img.shields.io/npm/dm/homebridge-tcc.svg?style=flat)](https://npmjs.org/package/homebridge-tcc)
+[![NPM Downloads](https://img.shields.io/npm/dm/homebridge-tcc-fan.svg?style=flat)](https://npmjs.org/package/homebridge-tcc-fan)
 
-This is a plugin for Honeywell Total Connect Comfort. It is a partially-working
-implementation into HomeKit. This plugin is work in progress. Help is appreciated!
+This is a plugin specifically for the Fan control in the Honeywell Total 
+Connect Comfort thermostat. HomeKit does not support independent fan 
+control within a Thermostat service. I had intended to enhance 
+homebridge-tcc, but had to implement this as a separate platform instead.
 
 # Devices Tested With
 
@@ -13,7 +15,7 @@ implementation into HomeKit. This plugin is work in progress. Help is appreciate
 # Installation
 
 1. Install homebridge using: npm install -g homebridge <br>
-2. Install this plugin using npm install -g homebridge-tcc
+2. Install this plugin using npm install -g homebridge-tcc-fan
 3. Update your configuration file. See sample-config below for a sample.
 
 # Configuration Sample
@@ -21,8 +23,8 @@ implementation into HomeKit. This plugin is work in progress. Help is appreciate
 ```
 "platforms": [
        {
-            "platform": "tcc",
-            "name" : "Thermostat",
+            "platform": "tcc-fan",
+            "name" : "Fan",
             "username" : ".....",
             "password" : ".....",
             "devices" : [
@@ -33,7 +35,7 @@ implementation into HomeKit. This plugin is work in progress. Help is appreciate
     ]
 ```
 
-- platform: tcc
+- platform: tcc-fan
 - name: can be anything you want
 - username: your Honeywell e-mail
 - password: your Honeywell password
@@ -49,14 +51,16 @@ use full for debugging no response errors.
 
 # Roadmap
 
-- Need to add throttling around temperature changes
+- None
 
 # Notes
 
 It seems to be vitally important to set the right system time, especially on raspi!
+TCC only responds to requests with a current unixtime
 
 # Credits
 
+- NorthernMan54 - Borrowed your awesome homebridge-tcc plugin as the foundation of this plugin
 - luc-ass - Borrowed your homebridge-evohome plugin as a base to start from
 - Dan / Ghostbit - Borrowed your python script for the page flow of the TCC website
 - bwdeleeuw - Fahrenheit testing and other enhancements
