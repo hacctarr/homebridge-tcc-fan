@@ -1,6 +1,6 @@
 {
   "name": "homebridge-tcc-fan",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Honeywell Total Connect Comfort Fan support for Homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
