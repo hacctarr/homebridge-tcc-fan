@@ -199,7 +199,7 @@ tccAccessory.prototype = {
             // verify that the task did succeed
 
             tcc.login(this.username, this.password).then(function(session) {
-                session.setFanSwitch(that.deviceID, tcc.toTCCFanSystem(value)).then(function(taskId) {
+                session.setFanSwitch(that.deviceID, value).then(function(taskId) {
                     that.log("Successfully changed system!");
                     that.log(taskId);
                     // Update all information
@@ -251,7 +251,7 @@ tccAccessory.prototype = {
             .getCharacteristic(Characteristic.Name)
             .on('get', this.getName.bind(this));
 
-        // this.addOptionalCharacteristic(Characteristic.TargetFanState);
+        // this.addOptionalCharacteristic(Characteristic.On);
         if (this.device.latestData.hasFan && this.device.latestData.fanData && this.device.latestData.fanData.fanModeOnAllowed) {
             this.fanService
                 .getCharacteristic(Characteristic.On)
