@@ -239,9 +239,9 @@ tccAccessory.prototype = {
     getServices: function () {
         var that = this;
         that.log("getServices", this.name);
-        // Information Service
-        var informationService = new Service.AccessoryInformation();
 
+        // Information Service
+        const informationService = new Service.AccessoryInformation();
         informationService
             .setCharacteristic(Characteristic.Identify, this.name)
             .setCharacteristic(Characteristic.Manufacturer, "Honeywell")
