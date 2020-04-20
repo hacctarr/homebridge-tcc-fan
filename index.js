@@ -237,8 +237,6 @@ tccAccessory.prototype = {
     },
 
     getServices: function () {
-        const returnServices = [];
-
         var that = this;
         that.log("getServices", this.name);
         // Information Service
@@ -251,21 +249,15 @@ tccAccessory.prototype = {
             .setCharacteristic(Characteristic.Name, this.name)
             .setCharacteristic(Characteristic.SerialNumber, this.deviceID); // need to stringify the this.serial
 
+        const returnServices = [];
         returnServices.push(informationService);
 
         // Fan Service
         this.fanService = new Service.Fan(this.name);
-
-        // Switches for each mode
-        this.myMomemtarySwitchCirculate = new Service.Switch("Circulate", "mode-circulate");
-        this.myMomemtarySwitchFollowSchedule = new Service.Switch("Follow Schedule", "mode-follow-schedule");
-
-        // this.addOptionalCharacteristic(Characteristic.Name);
         this.fanService
             .getCharacteristic(Characteristic.Name)
             .on('get', this.getName.bind(this));
 
-        // this.addOptionalCharacteristic(Characteristic.On);
         if (this.device.latestData.hasFan && this.device.latestData.fanData && this.device.latestData.fanData.fanModeOnAllowed) {
             this.fanService
                 .getCharacteristic(Characteristic.On)
@@ -275,7 +267,8 @@ tccAccessory.prototype = {
             returnServices.push(this.fanService);
 
             if (this.showCirculate) {
-                this.log("Adding switch for \'Circulate\'...")
+                this.log("Adding switch for \'Circulate\'...");
+                this.myMomemtarySwitchCirculate = new Service.Switch("Circulate", "mode-circulate");
                 this.myMomemtarySwitchCirculate
                     .getCharacteristic(Characteristic.On)
                     .on("get", (callback) => {
@@ -294,11 +287,13 @@ tccAccessory.prototype = {
                             callback(null, s);
                         }
                     });
+                this.log("\'Circulate\' switch added!");
                 returnServices.push(this.showFollowSchedule);
             }
 
             if (this.showFollowSchedule) {
                 this.log("Adding switch for \'Follow Schedule\'...")
+                this.myMomemtarySwitchFollowSchedule = new Service.Switch("Follow Schedule", "mode-follow-schedule");
                 this.myMomemtarySwitchFollowSchedule
                     .getCharacteristic(Characteristic.On)
                     .on("get", (callback) => {
@@ -317,8 +312,8 @@ tccAccessory.prototype = {
                             callback(null, s);
                         }
                     });
+                this.log("\'Follow Schedule\' switch added!");
                 returnServices.push(this.myMomemtarySwitchFollowSchedule);
-                this.log('DONE')
             }
 
         }
