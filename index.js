@@ -250,7 +250,6 @@ tccAccessory.prototype = {
             .setCharacteristic(Characteristic.SerialNumber, this.deviceID); // need to stringify the this.serial
 
         const returnServices = [];
-        returnServices.push(informationService);
 
         // Fan Service
         this.fanService = new Service.Fan(this.name);
@@ -263,11 +262,9 @@ tccAccessory.prototype = {
                 .getCharacteristic(Characteristic.On)
                 .on('get', this.getState.bind(this))
                 .on('set', this.setState.bind(this));
-            
-            returnServices.push(this.fanService);
 
             if (this.showCirculate) {
-                this.log("Adding switch for \'Circulate\'...");
+                this.log("Creating switch for \'Circulate\'...");
                 this.myMomemtarySwitchCirculate = new Service.Switch("Circulate", "mode-circulate");
                 this.myMomemtarySwitchCirculate
                     .getCharacteristic(Characteristic.On)
@@ -287,12 +284,11 @@ tccAccessory.prototype = {
                             callback(null, s);
                         }
                     });
-                this.log("\'Circulate\' switch added!");
-                returnServices.push(this.showFollowSchedule);
+                this.log("\'Circulate\' switch created!");
             }
 
             if (this.showFollowSchedule) {
-                this.log("Adding switch for \'Follow Schedule\'...")
+                this.log("Creating switch for \'Follow Schedule\'...")
                 this.myMomemtarySwitchFollowSchedule = new Service.Switch("Follow Schedule", "mode-follow-schedule");
                 this.myMomemtarySwitchFollowSchedule
                     .getCharacteristic(Characteristic.On)
@@ -312,10 +308,19 @@ tccAccessory.prototype = {
                             callback(null, s);
                         }
                     });
-                this.log("\'Follow Schedule\' switch added!");
-                returnServices.push(this.myMomemtarySwitchFollowSchedule);
+                this.log("\'Follow Schedule\' switch created!");
             }
+        }
 
+        returnServices.push(informationService);
+        returnServices.push(this.fanService);
+
+        if (this.showCirculate && this.myMomemtarySwitchCirculate) {
+            returnServices.push(this.myMomemtarySwitchCirculate);
+        }
+
+        if (this.showFollowSchedule && this.myMomemtarySwitchFollowSchedule) {
+            returnServices.push(this.myMomemtarySwitchFollowSchedule);
         }
 
         return returnServices;
