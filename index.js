@@ -46,6 +46,9 @@ function tccPlatform(log, config, api) {
     this.log = log;
     this.devices = config['devices'];
 
+    this.showFanControl = config['showFanControl'] !== false;
+    this.showAuto = config['showAuto'] || false;
+    this.showOn = config['showOn'] || false;
     this.showCirculate = config['showCirculate'] || false;
     this.showFollowSchedule = config['showFollowSchedule'] || false;
 
@@ -76,7 +79,7 @@ tccPlatform.prototype = {
 
                                 var newAccessory = new tccAccessory(that.log, device.name,
                                     deviceData, that.username, that.password, device.deviceID, that.debug,
-                                    that.showCirculate, that.showFollowSchedule);
+                                    that.showFanControl, that.showAuto, that.showOn, that.showCirculate, that.showFollowSchedule);
                                 // store accessory in myAccessories
                                 myAccessories.push(newAccessory);
                                 resolve();
@@ -147,11 +150,10 @@ function updateValues(that) {
                     // TODO replace for 1.x accessory.newAccessory.updateReachability(false);
                 }
 
-                if (!tcc.deepEquals(deviceData, accessory.device)) {
+                if (accessory.fanService && !tcc.deepEquals(deviceData, accessory.device)) {
                     that.log("Change", accessory.name, tcc.diff(accessory.device, deviceData));
                     accessory.device = deviceData;
                     updateStatus(that, accessory.fanService, deviceData);
-
                 } else {
                     that.log("No change", accessory.name);
                 }
@@ -162,7 +164,7 @@ function updateValues(that) {
 
 // give this function all the parameters needed
 
-function tccAccessory(log, name, deviceData, username, password, deviceID, debug, showCirculate, showFollowSchedule) {
+function tccAccessory(log, name, deviceData, username, password, deviceID, debug, showFanControl, showAuto, showOn, showCirculate, showFollowSchedule) {
 
     var uuid = UUIDGen.generate(name);
 
@@ -179,6 +181,9 @@ function tccAccessory(log, name, deviceData, username, password, deviceID, debug
     this.password = password;
     this.deviceID = deviceID;
     this.debug = debug;
+    this.showFanControl = showFanControl;
+    this.showAuto = showAuto;
+    this.showOn = showOn;
     this.showCirculate = showCirculate;
     this.showFollowSchedule = showFollowSchedule;
 
@@ -251,17 +256,71 @@ tccAccessory.prototype = {
 
         const returnServices = [];
 
+        this.log("this.showFanControl: [" + this.showFanControl + "]");
+
         // Fan Service
-        this.fanService = new Service.Fan(this.name);
-        this.fanService
-            .getCharacteristic(Characteristic.Name)
-            .on('get', this.getName.bind(this));
+        if (this.showFanControl) {
+            this.fanService = new Service.Fan(this.name);
+            this.fanService
+                .getCharacteristic(Characteristic.Name)
+                .on('get', this.getName.bind(this));
+        }
 
         if (this.device.latestData.hasFan && this.device.latestData.fanData && this.device.latestData.fanData.fanModeOnAllowed) {
-            this.fanService
-                .getCharacteristic(Characteristic.On)
-                .on('get', this.getState.bind(this))
-                .on('set', this.setState.bind(this));
+            if (this.showFanControl) {
+                this.fanService
+                    .getCharacteristic(Characteristic.On)
+                    .on('get', this.getState.bind(this))
+                    .on('set', this.setState.bind(this));
+            }
+
+            if (this.showAuto) {
+                this.log("Creating switch for \'Auto\'...");
+                this.myMomemtarySwitchAuto = new Service.Switch("Auto", "mode-auto");
+                this.myMomemtarySwitchAuto
+                    .getCharacteristic(Characteristic.On)
+                    .on("get", (callback) => {
+                        callback(false)
+                    })
+                    .on("set", (s, callback) => {
+                        if (s === true) {
+                            if (myAccessories && myAccessories[0]) {
+                                myAccessories[0].setState(0, callback);
+                            }
+                            // reset switch to off
+                            setTimeout(function () {
+                                this.myMomemtarySwitchAuto.setCharacteristic(Characteristic.On, false);
+                            }.bind(this), 500);
+                        } else {
+                            callback(null, s);
+                        }
+                    });
+                this.log("\'Auto\' switch created!");
+            }
+
+            if (this.showOn) {
+                this.log("Creating switch for \'On\'...");
+                this.myMomemtarySwitchOn = new Service.Switch("On", "mode-on");
+                this.myMomemtarySwitchOn
+                    .getCharacteristic(Characteristic.On)
+                    .on("get", (callback) => {
+                        callback(false)
+                    })
+                    .on("set", (s, callback) => {
+                        if (s === true) {
+                            if (myAccessories && myAccessories[0]) {
+                                myAccessories[0].setState(1, callback);
+                            }
+                            // reset switch to off
+                            setTimeout(function () {
+                                this.myMomemtarySwitchOn.setCharacteristic(Characteristic.On, false);
+                            }.bind(this), 500);
+                        } else {
+                            callback(null, s);
+                        }
+                    });
+                this.log("\'On\' switch created!");
+            }
 
             if (this.showCirculate) {
                 this.log("Creating switch for \'Circulate\'...");
@@ -313,7 +372,18 @@ tccAccessory.prototype = {
         }
 
         returnServices.push(informationService);
-        returnServices.push(this.fanService);
+
+        if (this.showFanControl) {
+            returnServices.push(this.fanService);
+        }
+
+        if (this.showOn && this.myMomemtarySwitchOn) {
+            returnServices.push(this.myMomemtarySwitchOn);
+        }
+
+        if (this.showAuto && this.myMomemtarySwitchAuto) {
+            returnServices.push(this.myMomemtarySwitchAuto);
+        }
 
         if (this.showCirculate && this.myMomemtarySwitchCirculate) {
             returnServices.push(this.myMomemtarySwitchCirculate);

@@ -48,6 +48,11 @@ The last part is your Device ID.
 - debug: optional parameter, will return details in log around response from TCC,
 use full for debugging no response errors.
 - refresh: How often the data is refreshed from the TCC website, in seconds.  Defaults to 60
+- showFanControl: Show traditional HomeKit fan control (On is On and Off is Auto)
+- showOn: Show a momentary switch for On fan mode.
+- showAuto: Show a momentary switch for Auto fan mode.
+- showCirculate: Show a momentary switch for Circulate fan mode.
+- showFollowSchedule: Show a momentary switch for Follow Schedule fan mode.
 
 # Roadmap
 
