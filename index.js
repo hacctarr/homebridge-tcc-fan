@@ -256,22 +256,24 @@ tccAccessory.prototype = {
 
         const returnServices = [];
 
-        this.log("this.showFanControl: [" + this.showFanControl + "]");
-
         // Fan Service
         if (this.showFanControl) {
+            this.log("Creating fan service...");
             this.fanService = new Service.Fan(this.name);
             this.fanService
                 .getCharacteristic(Characteristic.Name)
                 .on('get', this.getName.bind(this));
+            this.log("Fan service created!")
         }
 
         if (this.device.latestData.hasFan && this.device.latestData.fanData && this.device.latestData.fanData.fanModeOnAllowed) {
             if (this.showFanControl) {
+                this.log("Updating fan service...");
                 this.fanService
                     .getCharacteristic(Characteristic.On)
                     .on('get', this.getState.bind(this))
                     .on('set', this.setState.bind(this));
+                this.log("Fan service updated.")
             }
 
             if (this.showAuto) {

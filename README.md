@@ -56,7 +56,7 @@ use full for debugging no response errors.
 
 # Roadmap
 
-- None
+- Make the On/Auto/Circulate/Follow Schedule switches stateful.
 
 # Notes
 
