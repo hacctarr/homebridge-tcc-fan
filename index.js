@@ -27,7 +27,7 @@ var myAccessories = [];
 var session; // reuse the same login session
 var updating; // Only one change at a time!!!!
 
-module.exports = function (homebridge) {
+module.exports = function(homebridge) {
 
     Accessory = homebridge.platformAccessory;
     Service = homebridge.hap.Service;
@@ -56,14 +56,14 @@ function tccPlatform(log, config, api) {
 }
 
 tccPlatform.prototype = {
-    accessories: function (callback) {
+    accessories: function(callback) {
         this.log("Logging into tcc...");
         var that = this;
 
         tcc.setCharacteristic(Characteristic);
         tcc.setDebug(this.debug);
 
-        tcc.login(that.username, that.password).then(function (login) {
+        tcc.login(that.username, that.password).then(function(login) {
             this.log("Logged into tcc!", this.devices);
             session = login;
 
@@ -71,7 +71,7 @@ tccPlatform.prototype = {
                 return new Promise((resolve) => {
 
                     session.CheckDataSession(device.deviceID,
-                        function (err, deviceData) {
+                        function(err, deviceData) {
                             if (err) {
                                 that.log("Create Device Error", err);
                                 resolve();
@@ -98,7 +98,7 @@ tccPlatform.prototype = {
             });
 
             // End of login section
-        }.bind(this)).fail(function (err) {
+        }.bind(this)).fail(function(err) {
             // tell me if login did not work!
             that.log("Error during Login:", err);
             callback(err);
@@ -116,24 +116,24 @@ function updateStatus(that, service, data) {
 
 }
 
-tccPlatform.prototype.periodicUpdate = function (t) {
+tccPlatform.prototype.periodicUpdate = function(t) {
     this.log("periodicUpdate");
     var t = updateValues(this);
 }
 
 function updateValues(that) {
     that.log("updateValues", myAccessories.length);
-    myAccessories.forEach(function (accessory) {
+    myAccessories.forEach(function(accessory) {
 
-        session.CheckDataSession(accessory.deviceID, function (err, deviceData) {
+        session.CheckDataSession(accessory.deviceID, function(err, deviceData) {
             if (err) {
                 that.log("ERROR: UpdateValues", accessory.name, err);
                 that.log("updateValues: Device not reachable", accessory.name);
                 // TODO replace for 1.x accessory.newAccessory.updateReachability(false);
-                tcc.login(that.username, that.password).then(function (login) {
+                tcc.login(that.username, that.password).then(function(login) {
                     that.log("Logged into tcc!");
                     session = login;
-                }.bind(this)).fail(function (err) {
+                }.bind(this)).fail(function(err) {
                     // tell me if login did not work!
                     that.log("Error during Login:", err);
                 });
@@ -192,7 +192,7 @@ function tccAccessory(log, name, deviceData, username, password, deviceID, debug
 
 tccAccessory.prototype = {
 
-    getName: function (callback) {
+    getName: function(callback) {
 
         var that = this;
         that.log("requesting name of", this.name);
@@ -200,7 +200,7 @@ tccAccessory.prototype = {
 
     },
 
-    setState: function (value, callback) {
+    setState: function(value, callback) {
         var that = this;
         if (!updating) {
             updating = true;
@@ -209,8 +209,8 @@ tccAccessory.prototype = {
             // TODO:
             // verify that the task did succeed
 
-            tcc.login(this.username, this.password).then(function (session) {
-                session.setFanSwitch(that.deviceID, value).then(function (taskId) {
+            tcc.login(this.username, this.password).then(function(session) {
+                session.setFanSwitch(that.deviceID, value).then(function(taskId) {
                     that.log("Successfully changed system!");
                     that.log(taskId);
                     // Update all information
@@ -218,7 +218,7 @@ tccAccessory.prototype = {
                     updateValues(that);
                     callback(null, Number(1));
                 });
-            }).fail(function (err) {
+            }).fail(function(err) {
                 that.log('tcc Failed:', err);
                 callback(null, Number(0));
             });
@@ -227,7 +227,7 @@ tccAccessory.prototype = {
         }
     },
 
-    getState: function (callback) {
+    getState: function(callback) {
         var that = this;
 
         // Homekit allowed values
@@ -241,7 +241,7 @@ tccAccessory.prototype = {
         callback(null, Boolean(TargetFanState));
     },
 
-    getServices: function () {
+    getServices: function() {
         var that = this;
         that.log("getServices", this.name);
 
@@ -288,7 +288,7 @@ tccAccessory.prototype = {
                                 myAccessories[0].setState(0, callback);
                             }
                             // reset switch to off
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 this.myMomemtarySwitchAuto.setCharacteristic(Characteristic.On, false);
                             }.bind(this), 500);
                         } else {
@@ -312,7 +312,7 @@ tccAccessory.prototype = {
                                 myAccessories[0].setState(1, callback);
                             }
                             // reset switch to off
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 this.myMomemtarySwitchOn.setCharacteristic(Characteristic.On, false);
                             }.bind(this), 500);
                         } else {
@@ -336,7 +336,7 @@ tccAccessory.prototype = {
                                 myAccessories[0].setState(2, callback);
                             }
                             // reset switch to off
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 this.myMomemtarySwitchCirculate.setCharacteristic(Characteristic.On, false);
                             }.bind(this), 500);
                         } else {
@@ -360,7 +360,7 @@ tccAccessory.prototype = {
                                 myAccessories[0].setState(3, callback);
                             }
                             // reset switch to off
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 this.myMomemtarySwitchFollowSchedule.setCharacteristic(Characteristic.On, false);
                             }.bind(this), 500);
                         } else {
