@@ -117,12 +117,12 @@ function updateStatus(that, service, data) {
 }
 
 tccPlatform.prototype.periodicUpdate = function(t) {
-    this.log("periodicUpdate");
+    if (this.debug) this.log("periodicUpdate");
     var t = updateValues(this);
 }
 
 function updateValues(that) {
-    that.log("updateValues", myAccessories.length);
+    if (that.debug) that.log("updateValues", myAccessories.length);
     myAccessories.forEach(function(accessory) {
 
         session.CheckDataSession(accessory.deviceID, function(err, deviceData) {
