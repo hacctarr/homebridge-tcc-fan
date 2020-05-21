@@ -138,24 +138,23 @@ function updateValues(that) {
                     that.log("Error during Login:", err);
                 });
             } else {
-                if (that.debug)
-                    that.log("Update Values", accessory.name, deviceData);
+                if (that.debug) that.log("Update Values", accessory.name, deviceData);
                 // Data is live
 
                 if (deviceData.deviceLive) {
-                    //                    that.log("updateValues: Device reachable", accessory.name);
+                    if (that.debug) that.log("updateValues: Device reachable", accessory.name);
                     // TODO replace for 1.x accessory.newAccessory.updateReachability(true);
                 } else {
-                    that.log("updateValues: Device not reachable", accessory.name);
+                    if (that.debug) that.log("updateValues: Device not reachable", accessory.name);
                     // TODO replace for 1.x accessory.newAccessory.updateReachability(false);
                 }
 
                 if (accessory.fanService && !tcc.deepEquals(deviceData, accessory.device)) {
-                    that.log("Change", accessory.name, tcc.diff(accessory.device, deviceData));
+                    if (that.debug) that.log("Change", accessory.name, tcc.diff(accessory.device, deviceData));
                     accessory.device = deviceData;
                     updateStatus(that, accessory.fanService, deviceData);
                 } else {
-                    that.log("No change", accessory.name);
+                    if (that.debug) that.log("No change", accessory.name);
                 }
             }
         });
@@ -193,11 +192,9 @@ function tccAccessory(log, name, deviceData, username, password, deviceID, debug
 tccAccessory.prototype = {
 
     getName: function(callback) {
-
         var that = this;
         that.log("requesting name of", this.name);
         callback(this.name);
-
     },
 
     setState: function(value, callback) {
